@@ -7,7 +7,7 @@ export default function Header() {
             <Toolbar sx = {{border:'2px,solid,white',display: 'flex', justifyContent: 'space-between'}}>
                 <TextField placeholder='Search tasks...' 
                 variant='outlined' size='small' sx={{width:'72%', marginRight:'10',border:'2px,solid,white'}}></TextField>
-                <Button variant='contained' color='primary' sx={{border:'2px,solid,white',width:'25%'}}>
+                <Button variant='contained' color='primary' sx={{width:'25%'}}>
                         +Add Button
                     </Button>
             </Toolbar>

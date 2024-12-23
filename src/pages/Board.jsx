@@ -20,10 +20,18 @@ export default function Board() {
   const [showTaskForm,setShowTaskForm]=useState(false);
   const [taskTitle,setTaskTitle]=useState('');
   const [taskdescription,setTaskDescription]=useState('');
+  const [tasks,setTasks] = useState([]);
+  /*const [tasks, setTasks] = useState([
+    { id: '1', title: 'Task 1', description: 'Description 1', stage: 'To Do' },
+    { id: '2', title: 'Task 2', description: 'Description 2', stage: 'In Progress' },
+    { id: '3', title: 'Task 3', description: 'Description 3', stage: 'Peer Review' },
+    { id: '4', title: 'Task 4', description: 'Description 4', stage: 'Done' },
+  ]);*/
+  const stages = ['To Do', 'In Progress', 'Peer Review', 'Done'];
 
   const addTask = () => {
     const newTask = {
-      id: Date.now(),
+      id: `${Date.now()}`,
       title:taskTitle,
       description:taskdescription,
       stage:'To Do',
@@ -32,22 +40,17 @@ export default function Board() {
     setTaskTitle('');
     setTaskDescription('');
     setShowTaskForm(false);
-  }
+  };
 
-  const [tasks, setTasks] = useState([
-    { id: '1', title: 'Task 1', description: 'Description 1', stage: 'To Do' },
-    { id: '2', title: 'Task 2', description: 'Description 2', stage: 'In Progress' },
-    { id: '3', title: 'Task 3', description: 'Description 3', stage: 'Peer Review' },
-    { id: '4', title: 'Task 4', description: 'Description 4', stage: 'Done' },
-  ]);
-  const stages = ['To Do', 'In Progress', 'Peer Review', 'Done'];
+  
   const handleDragEnd = (result) => {
+    const { source, destination } = result;
     console.log("Drag Result:", result);
 
-    const { source, destination } = result;
+    
 
     // if dropped outside  a valid column or if is at same position do nothing just return
-    if (!result.destination || (source.droppableId === destination.droppableId && source.index === destination.index)) {
+    if (!destination || (source.droppableId === destination.droppableId && source.index === destination.index)) {
       return}; 
 
     const sourceStage = source.droppableId;
@@ -77,11 +80,12 @@ export default function Board() {
   return (
     <>
     {/*Drag and drop context */}
+    {console.log(tasks)}
     <DragDropContext onDragEnd={handleDragEnd}>
       <Box sx={boardStyles.container}>
         {
-          stages.map((stage,index)=>(
-            <Column title={stage} index={index} tasks={tasks} id={stage} />
+          stages.map((stage)=>(
+            <Column key={stage} title={stage} tasks={tasks} id={stage}/>
           ))
         }
       </Box>

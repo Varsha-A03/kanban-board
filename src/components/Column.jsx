@@ -66,6 +66,18 @@ export default function Column({title,id,tasks}) {
                 
               ))
               }
+              {/* Display placeholder for empty state */}
+            {!tasks.some((task) => task.stage === title) && (
+              <Typography
+                sx={{
+                  textAlign: 'center',
+                  color: 'gray',
+                  fontStyle: 'italic',
+                }}
+              >
+                No tasks yet
+              </Typography>
+            )}
               {provided.placeholder}
             </Box>
           )}

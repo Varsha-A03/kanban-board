@@ -1,5 +1,6 @@
 import Header from './components/Header';
 import Board from './pages/Board';
+import Column from './components/Column'
 import './styles/Global.css';
 function App() {
   return (

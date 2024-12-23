@@ -1,7 +1,8 @@
 import React,{useState} from 'react';
-import { Box} from '@mui/material';
+import { Box,Button,Fab, TextField} from '@mui/material';
 import Column from '../components/Column';
 import { DragDropContext} from 'react-beautiful-dnd';
+import AddIcon from '@mui/icons-material/Add';
 
 const boardStyles = {
   container : {
@@ -16,6 +17,23 @@ const boardStyles = {
   },
 }
 export default function Board() {
+  const [showTaskForm,setShowTaskForm]=useState(false);
+  const [taskTitle,setTaskTitle]=useState('');
+  const [taskdescription,setTaskDescription]=useState('');
+
+  const addTask = () => {
+    const newTask = {
+      id: Date.now(),
+      title:taskTitle,
+      description:taskdescription,
+      stage:'To Do',
+    };
+    setTasks([...tasks, newTask]);
+    setTaskTitle('');
+    setTaskDescription('');
+    setShowTaskForm(false);
+  }
+
   const [tasks, setTasks] = useState([
     { id: '1', title: 'Task 1', description: 'Description 1', stage: 'To Do' },
     { id: '2', title: 'Task 2', description: 'Description 2', stage: 'In Progress' },
@@ -57,6 +75,8 @@ export default function Board() {
   };
 
   return (
+    <>
+    {/*Drag and drop context */}
     <DragDropContext onDragEnd={handleDragEnd}>
       <Box sx={boardStyles.container}>
         {
@@ -66,6 +86,43 @@ export default function Board() {
         }
       </Box>
     </DragDropContext>
-    
+    {/*FAB floating action button component */}
+    <Fab color='primary' 
+      sx={{
+        position:'fixed',
+        bottom:'2rem',
+        right:'2rem',
+      }}
+      onClick={()=>setShowTaskForm(true)}
+    >
+      <AddIcon />
+    </Fab>
+    {/*show task form */}
+    {showTaskForm && (
+      <Box 
+        sx={{position:'fixed',bottom:'10rem',right:'2rem',padding:'2px',
+          backgroundColor:'white',borderRadius:'2px',boxShadow:'3'
+        }}
+      >
+        <TextField 
+          label="Task Title" value={taskTitle}
+          onChange={(e)=>setTaskTitle(e.target.value)}
+          fullWidth
+          
+        />
+        <TextField 
+          label="Task Description" value={taskdescription}
+          onChange={(e)=>setTaskDescription(e.target.value)}
+          fullWidth
+          multiline
+          rows={4}
+        />
+        <Box sx={{display:'flex',justifyContent:'space-between',marginTop:'2px'}}>
+          <Button onClick={addTask}>Add Task</Button>
+          <Button onClick={()=>setShowTaskForm(false)}>Cancel</Button>
+        </Box>
+      </Box>
+    )}
+    </>
   );
 }

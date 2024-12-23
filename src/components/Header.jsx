@@ -23,14 +23,12 @@ export default function Header() {
                 <TextField placeholder='Search Tasks...' 
                 variant='outlined' size='small' 
                 sx={{
-                  width:'72%', 
+                  width:'100%',
                   marginRight:'10px',
                   borderRadius:'4px',
                   backgroundColor: 'white',
                   }}></TextField>
-                <Button variant='contained' color='primary' sx={{width:'25%',backgroundColor:'#663A82'}}>
-                        +Add Button
-                    </Button>
+  
             </Toolbar>
         </AppBar>
       </Box>

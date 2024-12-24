@@ -3,6 +3,8 @@ import { Box,Button,Fab, TextField} from '@mui/material';
 import Column from '../components/Column';
 import { DragDropContext} from 'react-beautiful-dnd';
 import AddIcon from '@mui/icons-material/Add';
+import { useSelector, useDispatch } from 'react-redux';
+import { addTask,updateTask } from '../redux/taskSlice';
 
 const boardStyles = {
   container : {
@@ -20,28 +22,29 @@ export default function Board() {
   const [showTaskForm,setShowTaskForm]=useState(false);
   const [taskTitle,setTaskTitle]=useState('');
   const [taskdescription,setTaskDescription]=useState('');
-  const [tasks,setTasks] = useState([]);
-  /*const [tasks, setTasks] = useState([
-    { id: '1', title: 'Task 1', description: 'Description 1', stage: 'To Do' },
-    { id: '2', title: 'Task 2', description: 'Description 2', stage: 'In Progress' },
-    { id: '3', title: 'Task 3', description: 'Description 3', stage: 'Peer Review' },
-    { id: '4', title: 'Task 4', description: 'Description 4', stage: 'Done' },
-  ]);*/
-  const stages = ['To Do', 'In Progress', 'Peer Review', 'Done'];
+  
+  const dispatch = useDispatch();
+  const tasks = useSelector((state)=>state.tasks.tasks);
 
-  const addTask = () => {
+  const stages = ['To_Do', 'In_Progress', 'Peer_Review', 'Done'];
+
+  const handleAddTask = () => {
     const newTask = {
       id: `${Date.now()}`,
       title:taskTitle,
       description:taskdescription,
-      stage:'To Do',
+      stage:'To_Do',
     };
-    setTasks([...tasks, newTask]);
+    dispatch(addTask(newTask));
+    console.log(tasks);
     setTaskTitle('');
     setTaskDescription('');
     setShowTaskForm(false);
   };
 
+  const deleteTask = (taskId) => {
+    setTaskDescription()
+  }
   
   const handleDragEnd = (result) => {
     const { source, destination } = result;
@@ -56,25 +59,18 @@ export default function Board() {
     const sourceStage = source.droppableId;
     const destinationStage = destination.droppableId;
 
-    // Get tasks for source and destination stages
-    const sourceTasks = tasks.filter((task)=>task.stage === sourceStage);
-    const destinationTasks = tasks.filter((task)=>task.stage === destinationStage);
+    const taskToUpdate = tasks.find(
+      (task, index) => task.stage === sourceStage && index === source.index
+    );
 
-    // Remove task from source column
-    const [movedTask] = sourceTasks.splice(source.index,1);
-    // Update tasks stage to destination column
-    movedTask.stage = destinationStage; 
-    // Insert task into destination column
-    destinationTasks.splice(destination.index, 0, movedTask);
-
-    const updatedTasks = [
-      ...tasks.filter((task)=> task.stage !== sourceStage && task.stage !== destinationStage),
-      ...sourceTasks,
-      ...destinationTasks,
-    ];
-
-    console.log("Updated Result:", updatedTasks);
-    setTasks(updatedTasks);
+    if(taskToUpdate) {
+      dispatch (
+        updateTask ({
+          id: taskToUpdate.id,
+          updates : {stage: destinationStage},
+        })
+      );
+    }
   };
 
   return (
@@ -122,7 +118,7 @@ export default function Board() {
           rows={4}
         />
         <Box sx={{display:'flex',justifyContent:'space-between',marginTop:'2px'}}>
-          <Button onClick={addTask}>Add Task</Button>
+          <Button onClick={handleAddTask}>Add Task</Button>
           <Button onClick={()=>setShowTaskForm(false)}>Cancel</Button>
         </Box>
       </Box>
@@ -130,3 +126,24 @@ export default function Board() {
     </>
   );
 }
+
+/*
+    // Get tasks for source and destination stages
+    const sourceTasks = tasks.filter((task)=>task.stage === sourceStage);
+    const destinationTasks = tasks.filter((task)=>task.stage === destinationStage);
+
+    // Remove task from source column
+    const [movedTask] = sourceTasks.splice(source.index,1);
+    // Update tasks stage to destination column
+    movedTask.stage = destinationStage; 
+    // Insert task into destination column
+    destinationTasks.splice(destination.index, 0, movedTask);
+
+    const updatedTasks = [
+      ...tasks.filter((task)=> task.stage !== sourceStage && task.stage !== destinationStage),
+      ...sourceTasks,
+      ...destinationTasks,
+    ];
+
+    console.log("Updated Result:", updatedTasks);
+    setTasks(updatedTasks);*/

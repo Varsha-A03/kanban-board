@@ -1,39 +1,53 @@
 import React,{useState} from 'react';
-import { Box,Button,Fab, TextField} from '@mui/material';
+import { Box,Button,Fab, TextField,Typography} from '@mui/material';
 import Column from '../components/Column';
-import { DragDropContext} from 'react-beautiful-dnd';
 import AddIcon from '@mui/icons-material/Add';
 import { useSelector, useDispatch } from 'react-redux';
 import { addTask,updateTask } from '../redux/taskSlice';
+import {  DndContext,DragOverlay,rectIntersection} from '@dnd-kit/core';
 
 const boardStyles = {
   container : {
+    boxSixing:'border-box',
     backgroundColor : '#E8E4EF',
-    padding : '2rem',
-    borderRadius : '10px',
-    boxShadow : ' 0 2px 5px rgba(0, 0, 0, 0.1)',
-    display : 'flex',
-    justifyContent : 'space-between',
-    width : '85%',
-    margin : '0 auto',
+    display:'flex',
+    justifyContent:'space-around',
+    alignItems : 'stretch',
+    gap:'5px',
+    padding: '20px',
+    height:'100vh',
+    width:'85%',
+    borderRadius:'10px',
+    margin:'0 auto',
+    marginBottom : '50px',
+    overflow : 'hidden',
   },
+  fab : {
+    position:'fixed',
+    bottom:'5rem',
+    right:'0rem',
+  },
+  taskForm : {position:'fixed',bottom:'10rem',right:'2rem',padding:'2px',
+    backgroundColor:'white',borderRadius:'2px',boxShadow:'3'
+  },
+
 }
 export default function Board() {
   const [showTaskForm,setShowTaskForm]=useState(false);
   const [taskTitle,setTaskTitle]=useState('');
   const [taskdescription,setTaskDescription]=useState('');
-  
+  const [activeTask,setActiveTask]=useState(null);
   const dispatch = useDispatch();
   const tasks = useSelector((state)=>state.tasks.tasks);
 
-  const stages = ['To_Do', 'In_Progress', 'Peer_Review', 'Done'];
+  const stages = ['To Do', 'In Progress', 'Peer Review', 'Done'];
 
   const handleAddTask = () => {
     const newTask = {
       id: `${Date.now()}`,
       title:taskTitle,
       description:taskdescription,
-      stage:'To_Do',
+      stage:'To Do',
     };
     dispatch(addTask(newTask));
     console.log(tasks);
@@ -42,11 +56,143 @@ export default function Board() {
     setShowTaskForm(false);
   };
 
-  const deleteTask = (taskId) => {
-    setTaskDescription()
+  const handleDragStart = (event) => {
+    const task = tasks.find((t)=>t.id === event.active.id);
+    setActiveTask(task);
   }
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    setActiveTask(null);
+    if (!over) return;
+
+     if(over) {
+      const taskToUpdate = tasks.find((task) => task.id === active.id);
+      if (taskToUpdate && taskToUpdate.stage !== over.id) {
+        dispatch(
+          updateTask({
+            id: active.id,
+            updates: { stage: over.id },
+          })
+        );
+      }
+    }
+  };
+
   
-  const handleDragEnd = (result) => {
+  return (
+    <>
+    {/*Drag and drop context */}
+    {console.log(tasks)}
+    <DndContext 
+    onDragStart={handleDragStart}
+    onDragEnd={handleDragEnd}>
+      <Box sx={boardStyles.container}>
+        {
+          stages.map((stage)=>(
+            <Column key={stage} title={stage} tasks={tasks} id={stage}/>
+          ))
+        }
+      </Box>
+    
+    {/*FAB floating action button component */}
+    <Fab color='primary' 
+      sx={boardStyles.fab}
+      onClick={()=>setShowTaskForm(true)}
+    >
+      <AddIcon />
+    </Fab>
+     {/* Drag Overlay */}
+     <DragOverlay>
+          {activeTask && (
+            <Box
+              sx={{
+                backgroundColor: getColumnTitleColor(activeTask.stage),
+                borderRadius: "10px",
+                cursor: "grab",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-around",
+                width: "180px",
+                height: "150px",
+                padding: "2px",
+                position:'relative',
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+              }}
+            >
+              <Typography sx={{ fontSize: '120%', fontFamily:'cursive',
+                fontWeight: "bold", textAlign: "center" }}>
+                {activeTask.title}
+              </Typography>
+              <Typography variant="body2" sx={{ fontSize:'120%',textAlign: "center" }}>
+                {activeTask.description}
+              </Typography>
+            </Box>
+          )}
+        </DragOverlay>
+    {/*show task form */}
+    {showTaskForm && (
+      <Box 
+        sx={boardStyles.taskForm}
+      >
+        <TextField 
+          label="Task Title" value={taskTitle}
+          onChange={(e)=>setTaskTitle(e.target.value)}
+          fullWidth
+          
+        />
+        <TextField 
+          label="Task Description" value={taskdescription}
+          onChange={(e)=>setTaskDescription(e.target.value)}
+          fullWidth
+          multiline
+          rows={4}
+        />
+        <Box sx={{display:'flex',justifyContent:'space-between',marginTop:'2px'}}>
+          <Button onClick={handleAddTask}>Add Task</Button>
+          <Button onClick={()=>setShowTaskForm(false)}>Cancel</Button>
+        </Box>
+      </Box>
+    )}
+    </DndContext>
+    </>
+  );
+}
+function getColumnTitleColor(titlename) {
+  switch(titlename) {
+    case 'To Do':
+      return '#EEC759';
+    case 'In Progress':
+      return '#FFC6D3';
+    case 'Peer Review':
+      return '#FFB480';
+    case 'Done':
+      return '#C6D84D'
+    default:
+      return 'violet';
+  }
+}
+/*
+    // Get tasks for source and destination stages
+    const sourceTasks = tasks.filter((task)=>task.stage === sourceStage);
+    const destinationTasks = tasks.filter((task)=>task.stage === destinationStage);
+
+    // Remove task from source column
+    const [movedTask] = sourceTasks.splice(source.index,1);
+    // Update tasks stage to destination column
+    movedTask.stage = destinationStage; 
+    // Insert task into destination column
+    destinationTasks.splice(destination.index, 0, movedTask);
+
+    const updatedTasks = [
+      ...tasks.filter((task)=> task.stage !== sourceStage && task.stage !== destinationStage),
+      ...sourceTasks,
+      ...destinationTasks,
+    ];
+
+    console.log("Updated Result:", updatedTasks);
+    setTasks(updatedTasks);
+    
+    const handleDragEnd1 = (result) => {
     const { source, destination } = result;
     console.log("Drag Result:", result);
 
@@ -73,77 +219,37 @@ export default function Board() {
     }
   };
 
-  return (
-    <>
-    {/*Drag and drop context */}
-    {console.log(tasks)}
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <Box sx={boardStyles.container}>
-        {
-          stages.map((stage)=>(
-            <Column key={stage} title={stage} tasks={tasks} id={stage}/>
-          ))
-        }
-      </Box>
-    </DragDropContext>
-    {/*FAB floating action button component */}
-    <Fab color='primary' 
-      sx={{
-        position:'fixed',
-        bottom:'2rem',
-        right:'2rem',
-      }}
-      onClick={()=>setShowTaskForm(true)}
-    >
-      <AddIcon />
-    </Fab>
-    {/*show task form */}
-    {showTaskForm && (
-      <Box 
-        sx={{position:'fixed',bottom:'10rem',right:'2rem',padding:'2px',
-          backgroundColor:'white',borderRadius:'2px',boxShadow:'3'
-        }}
-      >
-        <TextField 
-          label="Task Title" value={taskTitle}
-          onChange={(e)=>setTaskTitle(e.target.value)}
-          fullWidth
-          
-        />
-        <TextField 
-          label="Task Description" value={taskdescription}
-          onChange={(e)=>setTaskDescription(e.target.value)}
-          fullWidth
-          multiline
-          rows={4}
-        />
-        <Box sx={{display:'flex',justifyContent:'space-between',marginTop:'2px'}}>
-          <Button onClick={handleAddTask}>Add Task</Button>
-          <Button onClick={()=>setShowTaskForm(false)}>Cancel</Button>
-        </Box>
-      </Box>
-    )}
-    </>
-  );
-}
+    import DeleteIcon from '@mui/icons-material/Delete';
+     const {setNodeRef: setDeleteRef,isOver : isOverDelete } = useDroppable({
+    id:'delete-zone',
+  });
+  const customCollisionDetection = (entries, draggable) => {
+    // Prioritize the delete-zone droppable if present
+    const deleteZoneEntry = entries.find((entry) => entry.id === 'delete-zone');
+    return deleteZoneEntry ? [deleteZoneEntry] : closestCenter(entries, draggable);
+  };*/
+ {/*
+  if(over && over.id === 'delete-zone') {
+      dispatch(deleteTask(active.id));
+      return;
+    }
+    
 
-/*
-    // Get tasks for source and destination stages
-    const sourceTasks = tasks.filter((task)=>task.stage === sourceStage);
-    const destinationTasks = tasks.filter((task)=>task.stage === destinationStage);
-
-    // Remove task from source column
-    const [movedTask] = sourceTasks.splice(source.index,1);
-    // Update tasks stage to destination column
-    movedTask.stage = destinationStage; 
-    // Insert task into destination column
-    destinationTasks.splice(destination.index, 0, movedTask);
-
-    const updatedTasks = [
-      ...tasks.filter((task)=> task.stage !== sourceStage && task.stage !== destinationStage),
-      ...sourceTasks,
-      ...destinationTasks,
-    ];
-
-    console.log("Updated Result:", updatedTasks);
-    setTasks(updatedTasks);*/
+  {/* Delete Task Fab 
+ <Box ref={setDeleteRef}
+ sx={{
+   position:'fixed',
+   bottom:'1rem',
+   right:'1rem',
+   backgroundColor: isOverDelete ? '#FF4C4C' : '#FF6F61',
+   borderRadius: '50%',
+       width: '56px',
+       height: '56px',
+       display: 'flex',
+       alignItems: 'center',
+       justifyContent: 'center',
+       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+       zIndex: 1000, // Ensure it's above other elements
+       pointerEvents:'all',
+ }}><DeleteIcon sx={{ color: 'white' }}/></Box> */}
+ 

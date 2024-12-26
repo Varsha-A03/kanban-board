@@ -1,14 +1,26 @@
 import React from 'react'
 import {Box, Typography} from '@mui/material';
-import { Droppable} from 'react-beautiful-dnd';
 import TaskCard from './TaskCard';
+import { useDroppable, useDndContext } from '@dnd-kit/core';
 
 export default function Column({title,id,tasks}) {
+
+  const { setNodeRef, isOver } = useDroppable({
+    id,
+  });// Unique droppable ID
+
+  const { active } = useDndContext();// Access the active draggable task
+  // Determine whether the current droppable column is the same as the active task's column
+  const activeTaskId = active?.id;
+
+  const isSameColumn =
+    active?.data.current && active.data.current.stage === title;
+
   const titleColor = getColumnTitleColor(title);
   return (
     <>
       
-        <Box sx={{width:'300px'}}>
+        <Box sx={{width:'300px',minHeight:'100%',}}>
         {/*colum title */}
         <Typography variant='h6' align='center' 
             sx={{
@@ -22,35 +34,53 @@ export default function Column({title,id,tasks}) {
             }} >{title}</Typography>
        
         {/*Droppable component area */}
-        <Droppable droppableId={id}>
-          {(provided,snapshot)=>(
-            /*inner box */
-            <Box ref={provided.innerRef}
-              {...provided.droppableProps}
-              
+       
+            <Box ref={setNodeRef}
               sx={{
-                backgroundColor: snapshot.isDraggingOver? '#E0E0E0': 'ghostwhite',flex:1, 
-                boxShadow : ' 3px 2px 10px rgba(79, 44, 112, 0.32)',
+                boxSizing:'border-box',
+                backgroundColor: isOver ? '#E0E0E0' : 'ghostwhite',flex:1, 
+                boxShadow : ' 3px 2px 10px rgba(6, 5, 6, 0.32)',
                 borderRadius:'4px',
-                width:'300px',
-                minHeight:'100vh',
+                width:'100%',
+                margin:'5px',
+                padding:'5px',
+                display:'flex',
+                flexDirection:'column',
+                flex:1,
+                minHeight:'90%',
+                maxHeight: 'calc(100vh - 200px)', // Adjust the height if needed
                 position : 'relative',
-                overflowY:'auto'
+                overflowY:'auto',
+                pointerEvents:'all',
+                overflowX: 'hidden', // Hide horizontal scrolling
+                scrollbarWidth: 'thin', // Styling for scrollbar (Firefox)
+                '&::-webkit-scrollbar': {
+                  width: '8px', // Width of the scrollbar
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  backgroundColor: '#888', // Scrollbar thumb color
+                  borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb:hover': {
+                  backgroundColor: '#555', // Thumb color on hover
+                },
               }}
               
             >
+                    
               {/*Display drop here message*/}
-              {snapshot.isDraggingOver && (
+              {isOver && !isSameColumn && (
                 <Typography
                   sx={{
-                    position:'relative',
+                    position:'absolute',
                     top:'50%',
                     left:'50%',
                     transform:'translate(-50%,10%)',
                     color:'#3498DB',
                     fontWeight:'bold',
                     fontSize:'16px',
-                    pointerEvents:'none'
+                    pointerEvents:'none',
+                    zIndex:1,
                   }}
                 >
                   Drop Here
@@ -64,8 +94,8 @@ export default function Column({title,id,tasks}) {
                 <TaskCard task={task} index={index} key={task.id} 
                 ></TaskCard>
                 
-              ))
-              }
+              ))}
+              
               {/* Display placeholder for empty state */}
             {!tasks.some((task) => task.stage === title) && (
               <Typography
@@ -73,15 +103,13 @@ export default function Column({title,id,tasks}) {
                   textAlign: 'center',
                   color: 'gray',
                   fontStyle: 'italic',
+                  padding:'15px',
                 }}
               >
                 No tasks yet
               </Typography>
             )}
-              {provided.placeholder}
-            </Box>
-          )}
-        </Droppable>
+              </Box>
        </Box>
        
     </>

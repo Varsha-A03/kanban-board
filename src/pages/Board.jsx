@@ -2,6 +2,7 @@ import React,{useState,useEffect} from 'react';
 import { Box,Button,Fab, TextField,Typography} from '@mui/material';
 import Column from '../components/Column';
 import AddIcon from '@mui/icons-material/Add';
+import ClearAllIcon from '@mui/icons-material/ClearAll';
 import { useSelector, useDispatch } from 'react-redux';
 import { addTask,updateTask } from '../redux/taskSlice';
 import {  DndContext,DragOverlay,rectIntersection} from '@dnd-kit/core';
@@ -25,12 +26,12 @@ const boardStyles = {
   fab : {
     position:'fixed',
     bottom:'5rem',
-    right:'0rem',
+    right:'1rem',
   },
   taskForm : {position:'fixed',bottom:'10rem',right:'2rem',padding:'2px',
     backgroundColor:'white',borderRadius:'2px',boxShadow:'3'
   },
-
+  clearBtn : {position:'fixed', right:'0.5rem',bottom:'1rem'}
 }
 export default function Board() {
   const [showTaskForm,setShowTaskForm]=useState(false);
@@ -188,6 +189,17 @@ export default function Board() {
       </Box>
     )}
     </DndContext>
+    <Button
+      onClick={() => {
+        localStorage.removeItem("tasks");
+        localStorage.removeItem("searchQuery");
+        window.location.reload(); // Refresh to reset
+      }}
+      sx={boardStyles.clearBtn}
+      color='secondary' variant='contained'
+    >
+      <ClearAllIcon />
+    </Button>
     </>
   );
 }

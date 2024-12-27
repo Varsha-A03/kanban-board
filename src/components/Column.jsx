@@ -5,9 +5,16 @@ import { useDroppable, useDndContext } from '@dnd-kit/core';
 
 export default function Column({title,id,tasks}) {
 
+   // Ensure tasks is an array
+   if (!Array.isArray(tasks)) {
+    console.error("Tasks is not an array:", tasks);
+    tasks = []; // Default to an empty array if it's not
+  }
   const { setNodeRef, isOver } = useDroppable({
     id,
   });// Unique droppable ID
+
+  //const filteredTasks = tasks.filter((task) => task.stage === title);
 
   const { active } = useDndContext();// Access the active draggable task
   // Determine whether the current droppable column is the same as the active task's column
@@ -30,6 +37,11 @@ export default function Column({title,id,tasks}) {
               borderRadius: '4px',
               textAlign : 'center',
               marginBottom:'10px',
+              width:'98%',
+              fontSize:'25px',
+              fontFamily:'serif',
+              fontWeight:'bold',
+              
               
             }} >{title}</Typography>
        
@@ -39,7 +51,7 @@ export default function Column({title,id,tasks}) {
               sx={{
                 boxSizing:'border-box',
                 backgroundColor: isOver ? '#E0E0E0' : 'ghostwhite',flex:1, 
-                boxShadow : ' 3px 2px 10px rgba(6, 5, 6, 0.32)',
+                boxShadow : ' 3px 2px 10px rgba(53, 13, 53, 0.32)',
                 borderRadius:'4px',
                 width:'100%',
                 margin:'5px',

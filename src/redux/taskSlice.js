@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     tasks : [],
+    searchQuery : '',
 };
 const taskSlice = createSlice({
     name : 'tasks',
@@ -20,11 +21,13 @@ const taskSlice = createSlice({
                 Object.assign(task,updates);
             }
         },
-        
+        updateSearchQuery: (state,action) => {
+            state.searchQuery = action.payload;
+        },
     },
     
 });
 
-export const  {addTask,deleteTask,updateTask} = taskSlice.actions;
+export const  {addTask,deleteTask,updateTask,updateSearchQuery} = taskSlice.actions;
 
 export default taskSlice.reducer;

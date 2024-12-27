@@ -1,11 +1,11 @@
-import React,{useState} from 'react';
+import React,{useState,useEffect} from 'react';
 import { Box,Button,Fab, TextField,Typography} from '@mui/material';
 import Column from '../components/Column';
 import AddIcon from '@mui/icons-material/Add';
 import { useSelector, useDispatch } from 'react-redux';
 import { addTask,updateTask } from '../redux/taskSlice';
 import {  DndContext,DragOverlay,rectIntersection} from '@dnd-kit/core';
-
+import Header  from '../components/Header'; 
 const boardStyles = {
   container : {
     boxSixing:'border-box',
@@ -16,7 +16,7 @@ const boardStyles = {
     gap:'5px',
     padding: '20px',
     height:'100vh',
-    width:'85%',
+    width:'86%',
     borderRadius:'10px',
     margin:'0 auto',
     marginBottom : '50px',
@@ -37,10 +37,40 @@ export default function Board() {
   const [taskTitle,setTaskTitle]=useState('');
   const [taskdescription,setTaskDescription]=useState('');
   const [activeTask,setActiveTask]=useState(null);
+  const [filteredTasks, setFilteredTasks] = useState([]);
+
   const dispatch = useDispatch();
-  const tasks = useSelector((state)=>state.tasks.tasks);
+  const {tasks,searchQuery} = useSelector((state)=>state.tasks);
+
+  
+  
+  const handleSearch = (query) => {
+          if(!query.trim()) {
+            setFilteredTasks(tasks);
+          }
+          else {
+            const lowerCaseQuery = query.toLowerCase();
+            const newFilteredTasks = tasks.filter(
+              (task)=>
+              task.title.toLowerCase()===(lowerCaseQuery)
+            );
+          
+          setFilteredTasks(newFilteredTasks); // Showing matched tasks
+          } 
+
+          // Automatically clear the search input after operation
+          //dispatch(updateSearchQuery(''));
+      };
+  
 
   const stages = ['To Do', 'In Progress', 'Peer Review', 'Done'];
+
+  useEffect(() => {
+    // Update the filtered tasks based on the search query
+    if(!searchQuery.trim()) {
+      setFilteredTasks(tasks);
+    }
+  }, [tasks]);
 
   const handleAddTask = () => {
     const newTask = {
@@ -81,17 +111,21 @@ export default function Board() {
   
   return (
     <>
+    <Header onSearch={handleSearch}/>
     {/*Drag and drop context */}
     {console.log(tasks)}
     <DndContext 
     onDragStart={handleDragStart}
     onDragEnd={handleDragEnd}>
       <Box sx={boardStyles.container}>
-        {
+        { 
           stages.map((stage)=>(
-            <Column key={stage} title={stage} tasks={tasks} id={stage}/>
+            <Column key={stage} title={stage} tasks={filteredTasks} id={stage}/>
           ))
+         
         }
+       
+        
       </Box>
     
     {/*FAB floating action button component */}

@@ -1,6 +1,20 @@
-import React from 'react'
+import React,{useState} from 'react'
 import {AppBar, Toolbar, TextField, Button,Box} from '@mui/material';
-export default function Header() {
+import { useDispatch } from 'react-redux';
+import { updateSearchQuery } from '../redux/taskSlice';
+
+export default function Header({onSearch}) {
+  const dispatch = useDispatch();
+  const [searchInput, setSearchInput] = useState('');
+
+  const handleSearchChange = (event) => {
+    const query = event.target.value;
+    setSearchInput(query); // Dispatch action to update search query
+  };
+  const handleSearchClick = () => {
+    dispatch(updateSearchQuery(searchInput));// update the search query in redux store 
+    onSearch(searchInput);
+  };
   return (
     <>
         <Box sx={{display:'flex',justifyContent:'center'}}>
@@ -22,13 +36,15 @@ export default function Header() {
               }}>
                 <TextField placeholder='Search Tasks...' 
                 variant='outlined' size='small' 
+                value={searchInput}
+                onChange={handleSearchChange}
                 sx={{
                   width:'100%',
                   marginRight:'10px',
                   borderRadius:'4px',
                   backgroundColor: 'white',
                   }}></TextField>
-  
+              <Button variant="contained" color="primary" onClick={handleSearchClick}>Search</Button>
             </Toolbar>
         </AppBar>
       </Box>

@@ -5,7 +5,6 @@ import './styles/Global.css';
 function App() {
   return (
     <div style = {{ minHeight:'100vh'}}>
-      <Header />
       <Board />
     </div>
     

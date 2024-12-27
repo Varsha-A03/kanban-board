@@ -43,6 +43,8 @@ const boardStyles = {
         width:'95%',
         padding:'10px',
     },
+    boxShadow : '0px 2px 7px rgba(39, 7, 61, 0.63)',
+    
     ...globalStyles,
     
   },

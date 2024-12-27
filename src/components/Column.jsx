@@ -31,25 +31,29 @@ export default function Column({title,id,tasks}) {
           width:'300px',
           minHeight:'100%',
           flex:1,
-          '@media (max-height:768px)': { // mobile screens
+          '@media (max-height:768px) and (max-width: 1024px)': { // mobile screens
               width:'100%', //  full width for stacking
               minHeight:'auto',
           },
+          
           }}>
         {/*colum title */}
         <Typography variant='h6' align='center' 
             sx={{
               backgroundColor:titleColor,
-              boxShadow : ' 0 2px 5px rgba(19, 1, 1, 0.5)',
+              boxShadow : ' 0 3px 5px rgba(19, 1, 1, 0.7)',
               padding: '8px',
               borderRadius: '4px',
               textAlign : 'center',
-              marginBottom:'10px',
-              width:'98%',
+              margin:'10px',
+              width:'92%',
               fontSize:'25px',
               fontFamily:'serif',
               fontWeight:'bold',
-              
+              '@media (max-height:768px) and (max-width: 1024px)': { // mobile screens
+              width:'97%', //  full width for stacking
+              minHeight:'auto',
+              },
               
             }} >{title}</Typography>
        

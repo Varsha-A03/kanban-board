@@ -4,6 +4,18 @@ import {Box,Typography,IconButton} from '@mui/material';
 import { useDraggable } from '@dnd-kit/core';
 import zIndex from '@mui/material/styles/zIndex';
 
+const globalStyles = {
+  '&::-webkit-scrollbar': {
+    width: '8px',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: '#888',
+    borderRadius: '4px',
+  },
+  '&::-webkit-scrollbar-thumb:hover': {
+    backgroundColor: '#555',
+  },
+};
 
 const TaskCardStyles = {
   titleStyle : {
@@ -32,26 +44,31 @@ export default function TaskCard({task, index}) {
     pointerEvents: isDragging ? 'none' : 'auto',
   };
 
-
   return (
     <>
     
             <Box ref={setNodeRef} style={style} {...listeners} {...attributes}
                 sx={{
                   backgroundColor:getColumnTitleColor(task.stage),
-                                  borderRadius : '10px',
-                                  margin : '8px',
-                                  cursor : 'grab',
-                                  display : 'flex',
-                                  flexDirection : 'column',
-                                  justifyContent : 'space-around',
-                                  width:'180px',
-                                  height : '150px',
-                                  padding : '2px',
-                                  marginLeft:'50px',
-                                  position: 'relative',
-                                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                                  zIndex: isDragging ? 1000 : 'auto',
+                  borderRadius : '10px',
+                  margin : '8px',
+                  cursor : 'grab',
+                  display : 'flex',
+                  flexDirection : 'column',
+                  justifyContent : 'space-around',
+                  width:'180px',
+                  height : '150px',
+                  padding : '2px',
+                  position: isDragging?'absolute':'relative',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                  zIndex: isDragging ? 1000 : 'auto',
+                  pointerEvents: isDragging? 'none':'auto',
+                  '@media (max-width: 768px)': { // Mobile screens
+                    width: '90%', // Take up most of the screen width
+                    height: 'auto',
+                    fontSize: '14px',
+                  },
+                  
                 }}
             >
             {console.log("draggable id",task.id)

@@ -33,11 +33,19 @@ export default function Header({onSearch}) {
             justifyContent: 'center',
             border:'2px solid white',
             width:'89%',
-            marginBottom : '10px'
+            marginBottom : '10px',
+            '@media (max-width: 768px)': {
+                width: '95%',
+                padding: '0.5rem',
+              },
             }}>
             <Toolbar sx = {{
                 display: 'flex', 
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                '@media (max-width: 768px)': {
+                  flexDirection: 'column', // Stack search bar and button vertically
+                  alignItems: 'center',
+                },
               }}>
                 <TextField placeholder='Search Tasks...' 
                 variant='outlined' size='small' 
@@ -48,8 +56,18 @@ export default function Header({onSearch}) {
                   marginRight:'10px',
                   borderRadius:'4px',
                   backgroundColor: 'white',
+                  '@media (max-width: 768px)': {
+                    marginRight: '0',
+                    marginBottom: '10px', // Add space between search bar and button
+                  },
                   }}></TextField>
-              <Button variant="contained" color="primary" onClick={handleSearchClick}>Search</Button>
+              <Button variant="contained" color="primary" onClick={handleSearchClick}
+                sx={{
+                  '@media (max-width: 768px)': {
+                    width: '100%', // Full width button
+                  },
+                }}
+              >Search</Button>
             </Toolbar>
         </AppBar>
       </Box>

@@ -27,7 +27,15 @@ export default function Column({title,id,tasks}) {
   return (
     <>
       
-        <Box sx={{width:'300px',minHeight:'100%',}}>
+        <Box sx={{
+          width:'300px',
+          minHeight:'100%',
+          flex:1,
+          '@media (max-height:768px)': { // mobile screens
+              width:'100%', //  full width for stacking
+              minHeight:'auto',
+          },
+          }}>
         {/*colum title */}
         <Typography variant='h6' align='center' 
             sx={{
@@ -58,6 +66,8 @@ export default function Column({title,id,tasks}) {
                 padding:'5px',
                 display:'flex',
                 flexDirection:'column',
+                alignItems:'center',
+                justifyContent:'flex-start',
                 flex:1,
                 minHeight:'90%',
                 maxHeight: 'calc(100vh - 200px)', // Adjust the height if needed
@@ -93,6 +103,10 @@ export default function Column({title,id,tasks}) {
                     fontSize:'16px',
                     pointerEvents:'none',
                     zIndex:1,
+                    '@media (max-height:768px)': { // mobile screens
+                          width:'100%', //  full width for stacking
+                          minHeight:'auto',
+                      },
                   }}
                 >
                   Drop Here

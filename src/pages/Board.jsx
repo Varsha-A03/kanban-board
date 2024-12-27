@@ -1,17 +1,32 @@
 import React,{useState,useEffect} from 'react';
-import { Box,Button,Fab, TextField,Typography} from '@mui/material';
+import { Box,Button,Fab, GlobalStyles, TextField,Typography} from '@mui/material';
 import Column from '../components/Column';
 import AddIcon from '@mui/icons-material/Add';
 import ClearAllIcon from '@mui/icons-material/ClearAll';
 import { useSelector, useDispatch } from 'react-redux';
 import { addTask,updateTask } from '../redux/taskSlice';
-import {  DndContext,DragOverlay,rectIntersection} from '@dnd-kit/core';
+import {  closestCenter, DndContext,DragOverlay,rectIntersection} from '@dnd-kit/core';
 import Header  from '../components/Header'; 
+
+const globalStyles = {
+  '&::-webkit-scrollbar': {
+    width: '8px',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: '#888',
+    borderRadius: '4px',
+  },
+  '&::-webkit-scrollbar-thumb:hover': {
+    backgroundColor: '#555',
+  },
+};
+
 const boardStyles = {
   container : {
     boxSixing:'border-box',
     backgroundColor : '#E8E4EF',
     display:'flex',
+    flexWrap:'wrap',
     justifyContent:'space-around',
     alignItems : 'stretch',
     gap:'5px',
@@ -21,7 +36,15 @@ const boardStyles = {
     borderRadius:'10px',
     margin:'0 auto',
     marginBottom : '50px',
-    overflow : 'hidden',
+    overflow : 'auto',
+    '@media (max-width: 768px)' : { // mobile and smaller screens
+        flexDirection:'column', // Stack columns vertically
+        height:'auto', // Adjust height
+        width:'95%',
+        padding:'10px',
+    },
+    ...globalStyles,
+    
   },
   fab : {
     position:'fixed',
@@ -31,8 +54,12 @@ const boardStyles = {
   taskForm : {position:'fixed',bottom:'10rem',right:'2rem',padding:'2px',
     backgroundColor:'white',borderRadius:'2px',boxShadow:'3'
   },
-  clearBtn : {position:'fixed', right:'0.5rem',bottom:'1rem'}
+  clearBtn : {position:'fixed', right:'0.5rem',bottom:'1rem'},
+  scrollLockStyle : {
+    overflow:'hidden',
+  }
 }
+
 export default function Board() {
   const [showTaskForm,setShowTaskForm]=useState(false);
   const [taskTitle,setTaskTitle]=useState('');
@@ -90,10 +117,15 @@ export default function Board() {
   const handleDragStart = (event) => {
     const task = tasks.find((t)=>t.id === event.active.id);
     setActiveTask(task);
+    // apply scroll-lock style to body
+    document.body.style.overflow='hidden';
   }
   const handleDragEnd = (event) => {
     const { active, over } = event;
     setActiveTask(null);
+
+    // remove scroll-lock style from the body 
+    document.body.style.overflow = 'auto';
     if (!over) return;
 
      if(over) {
@@ -107,6 +139,7 @@ export default function Board() {
         );
       }
     }
+
   };
 
   
@@ -116,6 +149,7 @@ export default function Board() {
     {/*Drag and drop context */}
     {console.log(tasks)}
     <DndContext 
+    collisionDetection={rectIntersection}
     onDragStart={handleDragStart}
     onDragEnd={handleDragEnd}>
       <Box sx={boardStyles.container}>
@@ -298,4 +332,3 @@ function getColumnTitleColor(titlename) {
        zIndex: 1000, // Ensure it's above other elements
        pointerEvents:'all',
  }}><DeleteIcon sx={{ color: 'white' }}/></Box> */}
- 

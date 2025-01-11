@@ -5,28 +5,28 @@ import { useDroppable, useDndContext } from '@dnd-kit/core';
 
 export default function Column({title,id,tasks}) {
 
-   // Ensure tasks is an array
+   // Ensure tasks is an array to avoid runtime errors
    if (!Array.isArray(tasks)) {
     console.error("Tasks is not an array:", tasks);
     tasks = []; // Default to an empty array if it's not
   }
+  // Initialize a droppable area with a unique droppable ID
   const { setNodeRef, isOver } = useDroppable({
     id,
-  });// Unique droppable ID
-
-  //const filteredTasks = tasks.filter((task) => task.stage === title);
-
-  const { active } = useDndContext();// Access the active draggable task
-  // Determine whether the current droppable column is the same as the active task's column
-  const activeTaskId = active?.id;
+  });
+  // Access the active draggable task
+  const { active } = useDndContext();
+  
 
   const isSameColumn =
     active?.data.current && active.data.current.stage === title;
-
+  
+    // Determine whether the active draggable item belongs to this column
   const titleColor = getColumnTitleColor(title);
+  
   return (
     <>
-      
+      {/* Wrapper box for the column */}
         <Box sx={{
           width:'300px',
           minHeight:'100%',
@@ -57,12 +57,12 @@ export default function Column({title,id,tasks}) {
               
             }} >{title}</Typography>
        
-        {/*Droppable component area */}
+        {/*Droppable area for tasks*/}
        
             <Box ref={setNodeRef}
               sx={{
                 boxSizing:'border-box',
-                backgroundColor: isOver ? '#E0E0E0' : 'ghostwhite',flex:1, 
+                backgroundColor: isOver ? '#E0E0E0' : 'ghostwhite', 
                 boxShadow : ' 3px 2px 10px rgba(53, 13, 53, 0.32)',
                 borderRadius:'4px',
                 width:'100%',
@@ -94,8 +94,8 @@ export default function Column({title,id,tasks}) {
               
             >
                     
-              {/*Display drop here message*/}
-              {isOver && !isSameColumn && (
+              {/* Show a "Drop Here" message when a draggable item hovers over but is not in the same column */}
+            {isOver && !isSameColumn && (
                 <Typography
                   sx={{
                     position:'absolute',
@@ -117,7 +117,7 @@ export default function Column({title,id,tasks}) {
                 </Typography>
               )}
               {console.log("droppable id ",id)}
-              {/*Render the task components*/
+              {/* Render the task components filtered by the current column */
               
               tasks.filter((task)=>(task.stage===title))
               .map((task,index)=>(
@@ -126,7 +126,7 @@ export default function Column({title,id,tasks}) {
                 
               ))}
               
-              {/* Display placeholder for empty state */}
+              {/* Show a placeholder when no tasks exist in the column */}
             {!tasks.some((task) => task.stage === title) && (
               <Typography
                 sx={{
@@ -146,6 +146,7 @@ export default function Column({title,id,tasks}) {
   )
 }
 
+// Utility function to get a unique color for each column based on its title
 function getColumnTitleColor(titlename) {
   switch(titlename) {
     case 'To Do':

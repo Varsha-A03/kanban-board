@@ -1,9 +1,9 @@
-import React,{useState} from 'react'
-import { Draggable } from 'react-beautiful-dnd';
-import {Box,Typography,IconButton} from '@mui/material';
+import React from 'react'
+import {Box,Typography} from '@mui/material';
 import { useDraggable } from '@dnd-kit/core';
-import zIndex from '@mui/material/styles/zIndex';
+;
 
+// Global scrollbar styles
 const globalStyles = {
   '&::-webkit-scrollbar': {
     width: '8px',
@@ -17,6 +17,7 @@ const globalStyles = {
   },
 };
 
+// Styles specific to the task card
 const TaskCardStyles = {
   titleStyle : {
     fontSize:'120%',
@@ -32,10 +33,12 @@ const TaskCardStyles = {
 };
 
 export default function TaskCard({task, index}) {
- const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+ // Initialize draggable behavior for the task card
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: task.id,
   });
 
+  // Styles for the draggable task card, dynamically adjusted during dragging
   const style = {
     transform: transform ? `translate(${transform.x}px, ${transform.y}px)` : undefined,
     opacity: isDragging ? 0.7 : 1,
@@ -46,13 +49,15 @@ export default function TaskCard({task, index}) {
 
   return (
     <>
-    
-            <Box ref={setNodeRef} style={style} {...listeners} {...attributes}
+      <Box ref={setNodeRef} // Reference for DnD functionality
+          style={style} // Dynamic inline styles
+          {...listeners} // Drag event listeners
+          {...attributes} // Accessibility attributes
                 sx={{
-                  backgroundColor:getColumnTitleColor(task.stage),
+                  backgroundColor:getColumnTitleColor(task.stage), // Color based on the column's stage
                   borderRadius : '10px',
                   margin : '8px',
-                  cursor : 'grab',
+                  cursor : 'grab', // Change the cursor to indicate draggable
                   display : 'flex',
                   flexDirection : 'column',
                   justifyContent : 'space-around',
@@ -60,7 +65,7 @@ export default function TaskCard({task, index}) {
                   height : '150px',
                   padding : '2px',
                   position: isDragging?'absolute':'relative',
-                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Subtle shadow for styling
                   zIndex: isDragging ? 1000 : 'auto',
                   pointerEvents: isDragging? 'none':'auto',
                   '@media (max-width: 768px)': { // Mobile screens
@@ -68,7 +73,7 @@ export default function TaskCard({task, index}) {
                     height: 'auto',
                     fontSize: '14px',
                   },
-                  
+                  ...globalStyles,
                 }}
             >
             {console.log("draggable id",task.id)
@@ -83,6 +88,7 @@ export default function TaskCard({task, index}) {
         </>    
   )
 }
+// Utility function to get a unique color for each column based on its title
 function getColumnTitleColor(titlename) {
     switch(titlename) {
       case 'To Do':
@@ -98,58 +104,4 @@ function getColumnTitleColor(titlename) {
     }
   }
 
-  /*
-  import MoreVertIcon from '@mui/icons-material/MoreVert';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { useDispatch } from 'react-redux';
-import { deleteTask } from '../redux/taskSlice';
-toggleButtonStyle : {
-      position:'absolute',
-      top:'8px',
-      right:'8px',
-      color:'grey',
-      zIndex: 10001,
-    },  
-  deleteButtonStyle : {
-    position:'absolute',
-      bottom:'8px',
-      right:'8px',
-      color:'red',
-  },
-   const dispatch = useDispatch();
   
-  const [showDelete, setShowDelete] = useState(false);
-  
-    const toggleDeleteButton = ()=>{
-      setShowDelete((prev) => !prev);
-    };
-  
-    const handleDeleteTask = ()=>{
-      dispatch(deleteTask(task.id));
-      setShowDelete(false);
-    };
-  <IconButton onClick={ (e)=> {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleDeleteButton()}}
-                sx={TaskCardStyles.toggleButtonStyle}><MoreVertIcon/></IconButton>
-        {showDelete && (
-              < IconButton 
-                  onClick= {(e)=>
-                  {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleDeleteTask();
-                  }} 
-                  sx={{
-                    position:'absolute',
-                    top:'8px',
-                    right:'8px',
-                    color:'red',
-                    zIndex:1001,
-                    pointerEvents:'auto',
-                  }} >
-                    
-                  <DeleteIcon />
-                </IconButton>)}
-  */

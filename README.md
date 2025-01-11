@@ -1,70 +1,127 @@
-# Getting Started with Create React App
+# Kanban Board Application 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### Overview
+The Kanban Board is a task management application built using ReactJS, Redux, and DnD Kit. It allows users to:
+Add, update, delete, and move tasks between columns.
 
-## Available Scripts
+Search for tasks by title.
 
-In the project directory, you can run:
+Persist tasks and search queries in local storage.
 
-### `npm start`
+Work seamlessly on all device sizes (responsive design).
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Drag-and-drop tasks with smooth interactions and feedback.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Features 
 
-### `npm test`
+`Drag-and-Drop Functionality`: Move tasks between columns using DnD Kit.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+`Task Search`: Search for tasks by title, with results dynamically displayed.
 
-### `npm run build`
+`Local Storage`: Tasks and search queries are saved in the browser's local storage for persistence.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+`Responsive Design`: Adapts to all screen sizes, including mobile and tablet views.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+`Dynamic Columns`: Columns adjust size dynamically and display scrollbars for overflowing tasks.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Prerequisites
 
-### `npm run eject`
+Before setting up the application, ensure you have the following installed:
+```
+Node.js (v14 or later)  
+npm 
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Installation and Setup
+1. Clone the Repository
+    ```
+    git clone <repository-url>
+    cd kanban-board
+    ```
+2. Install Dependecies: Run the following command to install the required dependencies  
+    ```
+    npm install
+    ```
+3. Run the Application: Start the development server:
+    ```
+    npm start
+    ```
+The application will run at http://localhost:3000/.  
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+4. Build for Production: To create a production build  
+    ``` 
+    npm run build
+    ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Application Structure
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```
+src/
+├── components/
+│   ├── Board.jsx       # Main component managing the Kanban board
+│   ├── Column.jsx      # Column component for task organization
+│   ├── TaskCard.jsx   # Individual task card component
+│   └── Header.jsx     # Header with search functionality
+├── redux/
+│   ├── store.js       # Redux store setup
+│   └── taskSlice.js   # Redux slice for task management
+├── App.css               # Global styles
+├── App.js                # Root component
+├── index.js             # Application entry point
+└── utils/
+      └── useDebounce.js  # Custom hook for debounced search
+```
 
-## Learn More
+## Key Features Implementation
+ 
+1. Drag-and-Drop  
+```DnD Kit```: Used ```useDraggable``` for tasks and ```useDroppable``` for columns and the delete zone.  
+```DragOverlay```: Displays a floating task during drag-and-drop to avoid layout shifts.  
+2. Search Functionality  
+Search Input: Updates the Redux ```searchQuery``` state.  
+Debounced Search: A custom ```useDebounce``` hook delays search execution for better performance.  
+3. Local Storage
+    Tasks and search queries persist between browser sessions using ```localStorage```.  
+    Local storage is updated whenever tasks or search queries change.  
+4. Responsive Design  
+    Used CSS media queries to stack columns vertically on smaller screens.  
+    Adjusted task and column dimensions dynamically for all device sizes.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Usage
+1. Add a Task   
+    Click the Add Task button (floating action button) to open the task creation form.
+    Enter the task title and description, then click Add Task.
+2. Search for Tasks  
+    Use the search bar to type the task title.
+    Tasks matching the query will be displayed dynamically.
+3. Drag-and-Drop Tasks  
+    Click and hold a task card to drag it.
+    Drop the task in a desired column to update its status.
+4. Clear All Data  
+Click the Clear All button (floating action button) to remove all tasks and reset the board.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Issues and Edge Cases Addressed
+Tasks are persisted across sessions using local storage.
 
-### Code Splitting
+Columns always render, even when empty.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+"No matches found" is displayed when search queries return no results.
 
-### Analyzing the Bundle Size
+Scroll locking during drag-and-drop to avoid unintended scrolling.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Tasks are dynamically re-rendered based on the search query or state changes.
 
-### Making a Progressive Web App
+## Future Enhancements
+Add user authentication for multiple users.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Implement drag-and-drop animations.
 
-### Advanced Configuration
+Allow reordering tasks within a column.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Add due dates and priority levels to tasks.
 
-### Deployment
+## Contributions
+Contributions are welcome! Feel free to fork the repository and submit pull requests with improvements or fixes.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## License
+This project is licensed under the MIT License. See the LICENSE file for details.

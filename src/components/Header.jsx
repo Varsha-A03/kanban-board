@@ -1,16 +1,12 @@
-import React,{useState, useEffect} from 'react'
+import React,{useState} from 'react'
 import {AppBar, Toolbar, TextField, Button,Box} from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateSearchQuery } from '../redux/taskSlice';
 
 export default function Header({onSearch}) {
   const dispatch = useDispatch();
-  const searchQuery = useSelector((state)=>state.tasks.searchQuery); // Fetch search query
+ // const searchQuery = useSelector((state)=>state.tasks.searchQuery); // Fetch search query
   const [searchInput, setSearchInput] = useState('');
-
-  useEffect(() => {
-    setSearchInput(searchQuery);
-  },[searchQuery]);
 
   const handleSearchChange = (event) => {
     const query = event.target.value;
@@ -18,6 +14,7 @@ export default function Header({onSearch}) {
   };
   const handleSearchClick = () => {
     dispatch(updateSearchQuery(searchInput));// update the search query in redux store and local storage 
+    localStorage.setItem('searchQuery', searchInput); // Save the query in local storage
     onSearch(searchInput);
   };
   return (

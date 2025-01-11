@@ -1,13 +1,14 @@
 import React,{useState,useEffect} from 'react';
-import { Box,Button,Fab, GlobalStyles, TextField,Typography} from '@mui/material';
+import { Box,Button,Fab, TextField,Typography} from '@mui/material';
 import Column from '../components/Column';
 import AddIcon from '@mui/icons-material/Add';
 import ClearAllIcon from '@mui/icons-material/ClearAll';
 import { useSelector, useDispatch } from 'react-redux';
 import { addTask,updateTask } from '../redux/taskSlice';
-import {  closestCenter, DndContext,DragOverlay,rectIntersection} from '@dnd-kit/core';
+import {  DndContext,DragOverlay,rectIntersection} from '@dnd-kit/core';
 import Header  from '../components/Header'; 
 
+// Global Scrolling Styles
 const globalStyles = {
   '&::-webkit-scrollbar': {
     width: '8px',
@@ -21,6 +22,7 @@ const globalStyles = {
   },
 };
 
+// Styling for the board layout and other UI elements
 const boardStyles = {
   container : {
     boxSixing:'border-box',
@@ -37,15 +39,15 @@ const boardStyles = {
     margin:'0 auto',
     marginBottom : '50px',
     overflow : 'auto',
-    '@media (max-width: 768px)' : { // mobile and smaller screens
+    '@media (max-width: 768px)' : { // responsive design for mobile and smaller screens
         flexDirection:'column', // Stack columns vertically
-        height:'auto', // Adjust height
+        height:'auto', 
         width:'95%',
         padding:'10px',
     },
     boxShadow : '0px 2px 7px rgba(39, 7, 61, 0.63)',
     
-    ...globalStyles,
+    ...globalStyles, // Include global scrollbar styles
     
   },
   fab : {
@@ -63,6 +65,7 @@ const boardStyles = {
 }
 
 export default function Board() {
+  // State variables for managing task input, active task, and filtered tasks
   const [showTaskForm,setShowTaskForm]=useState(false);
   const [taskTitle,setTaskTitle]=useState('');
   const [taskdescription,setTaskDescription]=useState('');
@@ -71,9 +74,8 @@ export default function Board() {
 
   const dispatch = useDispatch();
   const {tasks,searchQuery} = useSelector((state)=>state.tasks);
-
   
-  
+  // Handle drag end: updates the task's stage and re-enables scrolling
   const handleSearch = (query) => {
           if(!query.trim()) {
             setFilteredTasks(tasks);
@@ -88,11 +90,8 @@ export default function Board() {
           setFilteredTasks(newFilteredTasks); // Showing matched tasks
           } 
 
-          // Automatically clear the search input after operation
-          //dispatch(updateSearchQuery(''));
       };
   
-
   const stages = ['To Do', 'In Progress', 'Peer Review', 'Done'];
 
   useEffect(() => {
@@ -116,12 +115,15 @@ export default function Board() {
     setShowTaskForm(false);
   };
 
+  // Handle drag start: sets the active task and disables scrolling
   const handleDragStart = (event) => {
     const task = tasks.find((t)=>t.id === event.active.id);
     setActiveTask(task);
     // apply scroll-lock style to body
     document.body.style.overflow='hidden';
   }
+
+  // Handle drag end: updates the task's stage and re-enables scrolling
   const handleDragEnd = (event) => {
     const { active, over } = event;
     setActiveTask(null);
@@ -147,6 +149,7 @@ export default function Board() {
   
   return (
     <>
+    {/* Header Component with Search Functionality */}
     <Header onSearch={handleSearch}/>
     {/*Drag and drop context */}
     {console.log(tasks)}
@@ -154,6 +157,7 @@ export default function Board() {
     collisionDetection={rectIntersection}
     onDragStart={handleDragStart}
     onDragEnd={handleDragEnd}>
+      {/* Board Layout */}
       <Box sx={boardStyles.container}>
         { 
           stages.map((stage)=>(
@@ -165,14 +169,14 @@ export default function Board() {
         
       </Box>
     
-    {/*FAB floating action button component */}
+    {/* Add Task Floating Action Button */}
     <Fab color='primary' 
       sx={boardStyles.fab}
       onClick={()=>setShowTaskForm(true)}
     >
       <AddIcon />
     </Fab>
-     {/* Drag Overlay */}
+     {/* Drag Overlay: Task preview while dragging */}
      <DragOverlay>
           {activeTask && (
             <Box
@@ -200,7 +204,7 @@ export default function Board() {
             </Box>
           )}
         </DragOverlay>
-    {/*show task form */}
+    {/* Task Form Modal */}
     {showTaskForm && (
       <Box 
         sx={boardStyles.taskForm}
@@ -225,6 +229,8 @@ export default function Board() {
       </Box>
     )}
     </DndContext>
+
+    {/* Clear All Button */}
     <Button
       onClick={() => {
         localStorage.removeItem("tasks");
@@ -239,6 +245,8 @@ export default function Board() {
     </>
   );
 }
+
+// Function to get the column color based on its title
 function getColumnTitleColor(titlename) {
   switch(titlename) {
     case 'To Do':
@@ -253,84 +261,3 @@ function getColumnTitleColor(titlename) {
       return 'violet';
   }
 }
-/*
-    // Get tasks for source and destination stages
-    const sourceTasks = tasks.filter((task)=>task.stage === sourceStage);
-    const destinationTasks = tasks.filter((task)=>task.stage === destinationStage);
-
-    // Remove task from source column
-    const [movedTask] = sourceTasks.splice(source.index,1);
-    // Update tasks stage to destination column
-    movedTask.stage = destinationStage; 
-    // Insert task into destination column
-    destinationTasks.splice(destination.index, 0, movedTask);
-
-    const updatedTasks = [
-      ...tasks.filter((task)=> task.stage !== sourceStage && task.stage !== destinationStage),
-      ...sourceTasks,
-      ...destinationTasks,
-    ];
-
-    console.log("Updated Result:", updatedTasks);
-    setTasks(updatedTasks);
-    
-    const handleDragEnd1 = (result) => {
-    const { source, destination } = result;
-    console.log("Drag Result:", result);
-
-    
-
-    // if dropped outside  a valid column or if is at same position do nothing just return
-    if (!destination || (source.droppableId === destination.droppableId && source.index === destination.index)) {
-      return}; 
-
-    const sourceStage = source.droppableId;
-    const destinationStage = destination.droppableId;
-
-    const taskToUpdate = tasks.find(
-      (task, index) => task.stage === sourceStage && index === source.index
-    );
-
-    if(taskToUpdate) {
-      dispatch (
-        updateTask ({
-          id: taskToUpdate.id,
-          updates : {stage: destinationStage},
-        })
-      );
-    }
-  };
-
-    import DeleteIcon from '@mui/icons-material/Delete';
-     const {setNodeRef: setDeleteRef,isOver : isOverDelete } = useDroppable({
-    id:'delete-zone',
-  });
-  const customCollisionDetection = (entries, draggable) => {
-    // Prioritize the delete-zone droppable if present
-    const deleteZoneEntry = entries.find((entry) => entry.id === 'delete-zone');
-    return deleteZoneEntry ? [deleteZoneEntry] : closestCenter(entries, draggable);
-  };*/
- {/*
-  if(over && over.id === 'delete-zone') {
-      dispatch(deleteTask(active.id));
-      return;
-    }
-    
-
-  {/* Delete Task Fab 
- <Box ref={setDeleteRef}
- sx={{
-   position:'fixed',
-   bottom:'1rem',
-   right:'1rem',
-   backgroundColor: isOverDelete ? '#FF4C4C' : '#FF6F61',
-   borderRadius: '50%',
-       width: '56px',
-       height: '56px',
-       display: 'flex',
-       alignItems: 'center',
-       justifyContent: 'center',
-       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-       zIndex: 1000, // Ensure it's above other elements
-       pointerEvents:'all',
- }}><DeleteIcon sx={{ color: 'white' }}/></Box> */}

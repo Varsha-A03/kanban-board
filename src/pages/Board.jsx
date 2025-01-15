@@ -99,7 +99,7 @@ export default function Board() {
     if(!searchQuery.trim()) {
       setFilteredTasks(tasks);
     }
-  }, [tasks]);
+  }, [tasks, searchQuery]);
 
   const handleAddTask = () => {
     const newTask = {

@@ -1,6 +1,6 @@
 import React,{useState} from 'react'
 import {AppBar, Toolbar, TextField, Button,Box} from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch} from 'react-redux';
 import { updateSearchQuery } from '../redux/taskSlice';
 
 export default function Header({onSearch}) {

@@ -17,11 +17,10 @@ export default function Column({title,id,tasks}) {
   // Access the active draggable task
   const { active } = useDndContext();
   
-
   const isSameColumn =
     active?.data.current && active.data.current.stage === title;
   
-    // Determine whether the active draggable item belongs to this column
+  // Determine whether the active draggable item belongs to this column
   const titleColor = getColumnTitleColor(title);
   
   return (
